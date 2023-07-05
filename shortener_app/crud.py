@@ -1,11 +1,13 @@
 # shortener_app/crud.py
+#
+# CRUD - create, read, update, delete
 
 from sqlalchemy.orm import Session
 
 from . import keygen, models, schemas
 
 
-# function to interact with db, create read update delete (CRUD)
+# function to create an entry in the db
 def create_db_url(db: Session, url: schemas.URLBase) -> models.URL:
     # uses create_unique_random_key from keygen.py to get unique key not
     # already in use in db
@@ -41,6 +43,16 @@ def get_db_url_by_secret_key(db: Session, secret_key: str) -> models.URL:
     return (
         db.query(models.URL)
         .filter(models.URL.secret_key == secret_key, models.URL.is_active)
+        .first()
+    )
+
+
+# checks blacklistdb for the requested url, returns entry if found and
+# returns NONE if not found
+def check_blacklist(db: Session, url: str) -> models.blacklist:
+    return (
+        db.query(models.blacklist)
+        .filter(models.blacklist.url == url)
         .first()
     )
 

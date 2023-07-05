@@ -25,3 +25,14 @@ class URL(Base):
     is_active = Column(Boolean, default=True)
     # counts how many times it's been clicked, starts at 0
     clicks = Column(Integer, default=0)
+
+
+# creates blacklist db as a child of Base
+class blacklist(Base):
+    # set the table name
+    __tablename__ = "blacklist"
+
+    # field for entry ID, used as primary key
+    id = Column(Integer, primary_key=True)
+    # field for URL to block
+    url = Column(String, unique=True, index=True)

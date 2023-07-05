@@ -18,7 +18,7 @@ from starlette.datastructures import URL
 
 # instantiates FastAPI as app, used to interact with FastAPI
 app = FastAPI()
-# biinds database engine with models.Base.metadata.creatte_all(), if db
+# binds database engine with models.Base.metadata.creatte_all(), if db
 # doesn't yet exist then it will create it on first launch
 models.Base.metadata.create_all(bind=engine)
 
@@ -39,6 +39,11 @@ def raise_not_found(request):
 # sets up bad request responses, takes in 'message'
 def raise_bad_request(message):
     raise HTTPException(status_code=400, detail=message)
+
+
+# exception for when user requests a blacklisted site, currently returns 403
+def raise_blacklisted_site(message):
+    raise HTTPException(status_code=403, detail=message)
 
 
 # makes FastAPI listen to the requests on the root path and returns message
@@ -72,21 +77,9 @@ def create_url(url: schemas.URLBase, db: Session = Depends(get_db)):
     # checks if target url is valid via validators  
     if not validators.url(url.target_url):
         raise_bad_request(message="Invalid URL.")
-    ######## - NOT USED v
-    # charset for key & secret_key, generates secret keys 
-    #chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    #key = "".join(secrets.choice(chars) for _ in range(5))
-    #secret_key = "".join(secrets.choice(chars) for _ in range(8))
-    # creates a database entry for the requested URL
-    #db_url = models.URL(
-    #    target_url=url.target_url, key=key, secret_key=secret_key
-    #    )
-    #db.add(db_url)
-    #db.commit()
-    #db.refresh(db_url)
-    # adds key and secret_key to db_url match URLInfo
-    ######## - NOT USED ^
-
+    # check if url not in blacklist
+    if crud.check_blacklist(db=db, url=url.target_url):
+        raise_bad_request(message="Blacklisted URL.")
     # usees create_db_url from crud.py to create the new db entry and uses the
     # fields key and secret_key to set the url and admin url
     db_url = crud.create_db_url(db=db, key=key)
