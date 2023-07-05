@@ -1,5 +1,5 @@
-fastapi==0.99.1
-pydantic==2.0.1
-SQLAlchemy==2.0.17
-starlette==0.28.0
-validators==0.20.0
+fastapi==0.75.0
+uvicorn==0.17.6
+sqlalchemy==1.4.32
+python-dotenv==0.19.2
+validators==0.18.2

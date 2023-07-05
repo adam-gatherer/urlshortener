@@ -56,21 +56,6 @@ def forward_to_target_url(
     db: Session = Depends(get_db)
     ):
     # checks the db for active url, assigns result to db_url
-    
-    ######## - NOT USED v
-    #db_url = (
-    #    db.query(models.url)
-    #    .filter(models.URL.key == url_key, models.URL.is_active)
-    #    .first()
-    #)
-    # checks if db_url is valid, if so returns redirect, otherwise calls on
-    # function to show error code
-    #if db_url:
-    #    return RedirectResponse(db_url.target_url)
-    #else:
-    #    raise_not_found(reqest)
-    ######## - NOT USED ^
-    # 
     if db_url:= crud.get_db_url_by_key(db=db, url_key=url_key):
         # update the number of clicks
         crud.update_db_clicks(db=db, db_url=db_url)
